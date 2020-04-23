@@ -30,25 +30,13 @@ description: "API details."
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#librerias de rapid</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">ebm.models</span> <span class="kn">import</span> <span class="n">RBM</span>
-<span class="kn">from</span> <span class="nn">ebm.optimizers</span> <span class="kn">import</span> <span class="n">SGD</span><span class="p">,</span> <span class="n">Adam</span><span class="p">,</span> <span class="n">outer_product</span>
-<span class="kn">from</span> <span class="nn">ebm.samplers</span> <span class="kn">import</span> <span class="n">ContrastiveDivergence</span> <span class="k">as</span> <span class="n">cd</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">cat</span><span class="p">,</span> <span class="n">einsum</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">mm</span><span class="p">,</span> <span class="n">randint</span><span class="p">,</span> <span class="n">rand_like</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">,</span> <span class="n">sign</span><span class="p">,</span>     \
-                  <span class="n">sqrt</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">zeros_like</span>
-<span class="kn">from</span> <span class="nn">torch.nn.functional</span> <span class="kn">import</span> <span class="n">linear</span><span class="p">,</span> <span class="n">dropout</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Parameter</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-</pre></div>
+</div>
+    {% endraw %}
 
-    </div>
-</div>
-</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -71,7 +59,7 @@ description: "API details."
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="say_hello" class="doc_header"><code>say_hello</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L6" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>say_hello</code>(<strong><code>to</code></strong>)</p>
+<h4 id="say_hello" class="doc_header"><code>say_hello</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L28" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>say_hello</code>(<strong><code>to</code></strong>)</p>
 </blockquote>
 <p>Say hello to somebody</p>
 
@@ -135,90 +123,58 @@ description: "API details."
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Las-clases-relevantes-de-rapid">Las clases relevantes de rapid<a class="anchor-link" href="#Las-clases-relevantes-de-rapid"> </a></h2>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># -----------------------------------------------------------------------------</span>
-<span class="c1"># Models</span>
-<span class="c1"># -----------------------------------------------------------------------------</span>
-<span class="k">class</span> <span class="nc">RBM_pm</span><span class="p">(</span><span class="n">RBM</span><span class="p">):</span>
+</div>
+    {% endraw %}
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_visible</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_hidden</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Restricted Boltzmann machine with spin-like neurons (their allowed</span>
-<span class="sd">           values are +1/-1) instead of binary (0/1) neurons, and with no</span>
-<span class="sd">           biases.</span>
-<span class="sd">           </span>
-<span class="sd">        Arguments:</span>
-<span class="sd">           </span>
-<span class="sd">            :param n_visible: The number nodes in the visible layer</span>
-<span class="sd">            :type n_visible: int</span>
-<span class="sd">            :param n_hidden: The number nodes in the hidden layer</span>
-<span class="sd">            :type n_hidden: int</span>
-<span class="sd">            :param sampler: Method used to draw samples from the model</span>
-<span class="sd">            :type sampler: :class:`ebm.samplers`</span>
-<span class="sd">            :param optimizer: Optimizer used for parameter updates</span>
-<span class="sd">            :type optimizer: :class:`ebm.optimizers`</span>
-<span class="sd">            :param device: Device where to perform computations. None is CPU.</span>
-<span class="sd">            :type device: torch.device</span>
-<span class="sd">            :param W: Optional parameter to specify the weights of the RBM</span>
-<span class="sd">            :type W: torch.nn.Parameter</span>
-<span class="sd">            :param vbias: Optional parameter to specify the visible biases of</span>
-<span class="sd">                          the RBM</span>
-<span class="sd">            :type vbias: torch.nn.Parameter</span>
-<span class="sd">            :param hbias: Optional parameter to specify the hidden biases of</span>
-<span class="sd">                          the RBM</span>
-<span class="sd">            :type hbias: torch.nn.Parameter</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">n_visible</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    {% raw %}
     
-    <span class="k">def</span> <span class="nf">free_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Computes the free energy for a given state of the visible layer.</span>
+<div class="cell border-box-sizing code_cell rendered">
 
-<span class="sd">        Arguments:</span>
+<div class="output_wrapper">
+<div class="output">
 
-<span class="sd">            :param v: The state of the visible layer of the RBM</span>
-<span class="sd">            :type v: torch.Tensor</span>
+<div class="output_area">
 
-<span class="sd">            :returns: torch.Tensor</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="n">wx_b</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hbias</span><span class="p">)</span>
-        
-        <span class="c1"># Fancy (and overflow-resistant) way of computing log(2cosh(x))</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">wx_b</span><span class="p">,</span> <span class="o">-</span><span class="n">wx_b</span><span class="p">)</span>
-        <span class="n">hidden_term</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="p">((</span><span class="o">-</span><span class="n">wx_b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">wx_b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span><span class="o">.</span><span class="n">log</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="o">-</span><span class="n">hidden_term</span>
 
-    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Trains the RBM.</span>
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="RBM_pm" class="doc_header"><code>class</code> <code>RBM_pm</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L36" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RBM_pm</code>(<strong><code>n_visible</code></strong>=<em><code>10</code></em>, <strong><code>n_hidden</code></strong>=<em><code>50</code></em>, <strong><code>sampler</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>weights</code></strong>=<em><code>None</code></em>) :: <code>RBM</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
 
-<span class="sd">        Arguments:</span>
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
 
-<span class="sd">            :param input_data: Batch of training points</span>
-<span class="sd">            :type input_data: torch.utils.data.DataLoader</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Epoch &#39;</span> <span class="o">+</span>
-                                            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))):</span>
-            
-            <span class="n">sample_data</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-            
-            <span class="n">vpos</span> <span class="o">=</span> <span class="n">sample_data</span>
-            <span class="n">vneg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_negative_sample</span><span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">vbias</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hbias</span><span class="p">)</span>
-            <span class="n">W_update</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
-                             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">get_updates</span><span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">vneg</span><span class="p">,</span>
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vbias</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hbias</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">+=</span> <span class="n">W_update</span>
-             
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
-</pre></div>
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
 
-    </div>
+    def forward(self, x):
+       x = F.relu(self.conv1(x))
+       return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -228,94 +184,49 @@ description: "API details."
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">RA_RBM</span><span class="p">(</span><span class="n">RBM_pm</span><span class="p">):</span>
+</div>
+    {% endraw %}
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_visible</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_hidden</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-                 <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;RBM where the weights are computed through the method of Restricted</span>
-<span class="sd">           Axon. The weights are computed from low-energy patterns, and the</span>
-<span class="sd">           parameters to be optimized is the patterns themselves</span>
-<span class="sd">        </span>
-<span class="sd">        Arguments:</span>
-<span class="sd">            </span>
-<span class="sd">            :param n_visible: The number nodes in the visible layer</span>
-<span class="sd">            :type n_visible: int</span>
-<span class="sd">            :param n_hidden: The number nodes in the hidden layer</span>
-<span class="sd">            :type n_hidden: int</span>
-<span class="sd">            :param K: The number of patterns from which the weights are computed</span>
-<span class="sd">            :type K: int</span>
-<span class="sd">            :param sampler: Method used to draw samples from the model</span>
-<span class="sd">            :type sampler: :class:`samplers`</span>
-<span class="sd">            :param optimizer: Optimizer used for parameter updates</span>
-<span class="sd">            :type optimizer: :class:`optimizers`</span>
-<span class="sd">            :param device: Device where to perform computations. None is CPU.</span>
-<span class="sd">            :type device: torch.device</span>
-<span class="sd">            :param xi: Optional parameter to specify the initial patterns</span>
-<span class="sd">            :type xi: torch.nn.Parameter</span>
-<span class="sd">            :param vbias: Optional parameter to specify the visible biases of</span>
-<span class="sd">                          the RBM</span>
-<span class="sd">            :type vbias: torch.nn.Parameter</span>
-<span class="sd">            :param hbias: Optional parameter to specify the hidden biases of</span>
-<span class="sd">                          the RBM</span>
-<span class="sd">            :type hbias: torch.nn.Parameter&#39;&#39;&#39;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">n_visible</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">K</span>         <span class="o">=</span> <span class="n">K</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_visible</span> <span class="o">=</span> <span class="n">n_visible</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span>  <span class="o">=</span> <span class="n">n_hidden</span>
-        
-        <span class="k">if</span> <span class="n">xi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="n">xi</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>
-                                             <span class="mi">2</span><span class="p">,</span>
-                                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_visible</span><span class="p">)</span>
-                                             <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-            <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>  
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
-            
-    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Computes the weight matrix of the RBM from the patterns&#39;&#39;&#39;</span>
-        <span class="n">vis</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_visible</span><span class="p">]</span>
-        <span class="n">hidd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_visible</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">outer_product</span><span class="p">(</span><span class="n">hidd</span><span class="p">,</span> <span class="n">vis</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">data</span> <span class="o">/=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Trains the RBM.</span>
+<div class="output_wrapper">
+<div class="output">
 
-<span class="sd">        Arguments:</span>
+<div class="output_area">
 
-<span class="sd">            :param input_data: Batch of training points</span>
-<span class="sd">            :type input_data: torch.utils.data.DataLoader</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Epoch &#39;</span> <span class="o">+</span>
-                                            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))):</span>
 
-            <span class="n">sample_data</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="RA_RBM" class="doc_header"><code>class</code> <code>RA_RBM</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L109" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RA_RBM</code>(<strong><code>n_visible</code></strong>=<em><code>100</code></em>, <strong><code>n_hidden</code></strong>=<em><code>50</code></em>, <strong><code>K</code></strong>=<em><code>50</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>xi</code></strong>=<em><code>None</code></em>) :: <a href="/rapidd/core#RBM_pm"><code>RBM_pm</code></a></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
 
-            <span class="n">vpos</span> <span class="o">=</span> <span class="n">sample_data</span>
-            <span class="c1"># Get negative phase from the patterns</span>
-            <span class="n">vneg</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">[:,</span> <span class="p">:</span><span class="n">vpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
 
-            <span class="n">xi_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">get_updates</span><span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">vneg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">+=</span> <span class="n">xi_update</span>
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
-        
-        <span class="c1"># Renormalize after the training epoch has concluded</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>    
-</pre></div>
+    def forward(self, x):
+       x = F.relu(self.conv1(x))
+       return F.relu(self.conv2(x))
 
-    </div>
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -325,82 +236,164 @@ description: "API details."
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># -----------------------------------------------------------------------------</span>
-<span class="c1"># Optimizers</span>
-<span class="c1"># -----------------------------------------------------------------------------</span>
-<span class="k">class</span> <span class="nc">SGD_xi</span><span class="p">(</span><span class="n">SGD</span><span class="p">):</span>
+</div>
+    {% endraw %}
+
+    {% raw %}
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Update the value of the pattern units via Stochastic Gradient Descent</span>
-<span class="sd">        </span>
-<span class="sd">        Arguments:</span>
+<div class="cell border-box-sizing code_cell rendered">
 
-<span class="sd">            :param learning_rate: Learning rate</span>
-<span class="sd">            :type learning_rate: float</span>
-<span class="sd">            :param weight_decay: Weight decay parameter, to prevent overfitting</span>
-<span class="sd">            :type weight_decay: float</span>
-<span class="sd">            :param momentum: Momentum parameter, for improved learning</span>
-<span class="sd">            :type momentum: float</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">weight_decay</span><span class="p">)</span>
+<div class="output_wrapper">
+<div class="output">
 
-    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">n_visible</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Computes the neuron connections (axons) of the RBM from the patterns</span>
-<span class="sd">        using the Hebbian rule</span>
-<span class="sd">        </span>
-<span class="sd">        Arguments:</span>
+<div class="output_area">
 
-<span class="sd">            :param xi: Patterns from which to compute the weights</span>
-<span class="sd">            :type xi: torch.Tensor</span>
-<span class="sd">            :param n_visible: Number of visible neurons in the model</span>
-<span class="sd">            :type n_visible: int</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">vis</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n_visible</span><span class="p">]</span>
-        <span class="n">hidd</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[:,</span> <span class="n">n_visible</span><span class="p">:]</span>
-        <span class="n">W</span> <span class="o">=</span> <span class="p">(</span><span class="n">mm</span><span class="p">(</span><span class="n">hidd</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span class="n">vis</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">W</span>
 
-    <span class="k">def</span> <span class="nf">get_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vpos</span><span class="p">,</span> <span class="n">vneg</span><span class="p">,</span> <span class="n">xi</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Obtain the parameter updates</span>
-<span class="sd">        </span>
-<span class="sd">        Arguments:</span>
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="SGD_xi" class="doc_header"><code>class</code> <code>SGD_xi</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L195" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SGD_xi</code>(<strong><code>learning_rate</code></strong>, <strong><code>momentum</code></strong>=<em><code>0</code></em>, <strong><code>weight_decay</code></strong>=<em><code>0</code></em>) :: <code>SGD</code></p>
+</blockquote>
 
-<span class="sd">            :param vpos: Batch of samples from the training set</span>
-<span class="sd">            :type vpos: torch.Tensor</span>
-<span class="sd">            :param vneg: Batch of samples drawn from the model</span>
-<span class="sd">            :type vneg: torch.Tensor</span>
-<span class="sd">            :param xi: Patterns from which to compute the weights</span>
-<span class="sd">            :type xi: torch.Tensor</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_call</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_vis</span>      <span class="o">=</span> <span class="n">vpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pos_batch</span>  <span class="o">=</span> <span class="n">vpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">neg_batch</span>  <span class="o">=</span> <span class="n">vneg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">K</span>          <span class="o">=</span> <span class="n">xi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xi_update</span>  <span class="o">=</span> <span class="n">zeros_like</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">first_call</span> <span class="o">=</span> <span class="kc">False</span>
+</div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">xi_update</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">momentum</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xi_update</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_decay</span> <span class="o">*</span> <span class="n">xi</span>
-        
-        <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vis</span><span class="p">)</span>
-        <span class="n">xi_vis</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vis</span><span class="p">]</span>
-        <span class="n">xi_hid</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vis</span><span class="p">:]</span>
-        <span class="n">deltaxi_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;bj,bk-&gt;kj&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">mm</span><span class="p">(</span><span class="n">tanh</span><span class="p">(</span><span class="n">mm</span><span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">t</span><span class="p">())),</span> <span class="n">xi_hid</span><span class="o">.</span><span class="n">t</span><span class="p">())))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_batch</span>
-                   <span class="o">-</span> <span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;bj,bk-&gt;kj&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">vneg</span><span class="p">,</span> <span class="n">mm</span><span class="p">(</span><span class="n">tanh</span><span class="p">(</span><span class="n">mm</span><span class="p">(</span><span class="n">vneg</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">t</span><span class="p">())),</span> <span class="n">xi_hid</span><span class="o">.</span><span class="n">t</span><span class="p">())))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">neg_batch</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
-        <span class="n">deltaxi_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;bj,kj,ba-&gt;ka&#39;</span><span class="p">,(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">xi_vis</span><span class="p">,</span> <span class="n">tanh</span><span class="p">(</span><span class="n">mm</span><span class="p">(</span><span class="n">vpos</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">t</span><span class="p">()))))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_batch</span>
-                   <span class="o">-</span> <span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;bj,kj,ba-&gt;ka&#39;</span><span class="p">,(</span><span class="n">vneg</span><span class="p">,</span> <span class="n">xi_vis</span><span class="p">,</span> <span class="n">tanh</span><span class="p">(</span><span class="n">mm</span><span class="p">(</span><span class="n">vneg</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">t</span><span class="p">()))))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">neg_batch</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
-        <span class="n">deltaxi</span> <span class="o">=</span> <span class="n">cat</span><span class="p">([</span><span class="n">deltaxi_v</span><span class="p">,</span> <span class="n">deltaxi_h</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xi_update</span><span class="o">.</span><span class="n">data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">deltaxi</span>
+</div>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xi_update</span>
-</pre></div>
+</div>
+</div>
 
-    </div>
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Aqui-empiezan-las-funciones-y-la-clase-de-utils-para-el-ejemplo-de-training">Aqui empiezan las funciones y la clase de utils para el ejemplo de training<a class="anchor-link" href="#Aqui-empiezan-las-funciones-y-la-clase-de-utils-para-el-ejemplo-de-training"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="GradientRBM" class="doc_header"><code>class</code> <code>GradientRBM</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L263" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GradientRBM</code>(<strong><code>n_visible</code></strong>=<em><code>10</code></em>, <strong><code>n_hidden</code></strong>=<em><code>50</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>weights</code></strong>=<em><code>None</code></em>) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+       x = F.relu(self.conv1(x))
+       return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="create_bars_4x4" class="doc_header"><code>create_bars_4x4</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L303" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_bars_4x4</code>()</p>
+</blockquote>
+<p>Create the 4x4-pixel Bars datasets, with flattened images</p>
+<p>:returns train_data: torch.Tensor of size (10,16) with training images
+:returns recon_train_data: torch.Tensor of size (10,16) with
+                           partially-erased training images
+:returns test_data: torch.Tensor of size (4,16) with testing images
+:returns recon_test_data: torch.Tensor of size (4,16) with
+                          partially-erased testing images</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="logsumexp" class="doc_header"><code>logsumexp</code><a href="https://github.com/Eloypinol/rapidd/tree/master/rapidd/core.py#L337" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>logsumexp</code>(<strong><code>tensor</code></strong>)</p>
+</blockquote>
+<p>Computes pointwise log(sum(exp())) for all elements in a torch tensor.
+The way of computing it without under- or overflows is through the
+log-sum-exp trick, namely computing
+log(1+exp(x)) = a + log(exp(-a) + exp(x-a))     with a = max(0, x)
+The function is adapted to be used in GPU if needed.</p>
+<p>Arguments:</p>
+
+<pre><code>:param tensor: torch.Tensor
+:returns: torch.Tensor</code></pre>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
